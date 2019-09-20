@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, render_template
+import get_data
 
 app = Flask(__name__, static_folder='static', static_url_path='/', template_folder="static")
 
