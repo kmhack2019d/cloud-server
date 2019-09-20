@@ -1,4 +1,4 @@
-var channel_token = "見せられないよ!!"
+var channel_token = "見せられないよ"
 var url = "https://api.line.me/v2/bot/message/reply"
 
 function doPost(e) {
