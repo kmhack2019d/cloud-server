@@ -7,8 +7,7 @@ app = Flask(__name__, static_folder='static', static_url_path='/', template_fold
 @app.route('/api/v1/get_data')
 def getData():
     data = get_data.getData()
-    newest_data = data
-    return jsonify(newest_data)
+    return jsonify(data)
 
 @app.route('/api/v1/get_image')
 def getImage():
