@@ -50,9 +50,14 @@
             <v-col class="text-center">
               <v-select
                 :items="items"
+                :value="currentItem"
                 label="Outlined style"
                 @change="showChart"
                 ></v-select>
+              <line-chart
+                :chartData="chartData"
+                class=chart
+                />
             </v-col>
           </v-row>
         </v-container>
@@ -81,8 +86,12 @@ import {
   CPS_APP_ID,
   CPS_GROUP_ID
 } from "./config.js"
+import LineChart from './components/LineChart'
 
 export default {
+  components: {
+    LineChart
+  },
   props: {
     source: String
   },
@@ -90,25 +99,48 @@ export default {
     drawer: null,
     activeBtn: 1,
     viewflag: 1,
-    items: ['渋谷', '品川', '池袋']
+    items: ['渋谷', '品川', '池袋'],
+    currentItem: null,
+    chartData: null,
   }),
   methods: {
-    showChart: (item) => {
+    showChart: function(item) {
+      this.currentItem = item
       cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
         .then(cred => {
           console.log(item)
           console.log("cred", cred.key)
           const admin = new cpsp.AdminStaff(cred.key)
-          const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', 'dummy.json', true)
+          let filename;
+          switch (item) {
+          case "渋谷":
+            filename = "dummysun.json"
+            break
+          case "品川":
+            filename = "dummymoon.json"
+            break
+          case "池袋":
+            filename = "dummyvenus.json"
+            break
+          default:
+            filename = "dummy.json"
+          }
+          const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', filename, true)
           file.download().then(d => {
             let reader = new FileReader()
             reader.onload = e => {
-              const str = e.target.result
-              // console.log(str)
-              console.log(JSON.parse(str))
-              // chartConfig.data.labels = Array.from({length: newdata.length}, (v, k) => k)
-              // chartConfig.data.datasets[0].data = newdata
-              // chart.update()
+              const stat = JSON.parse(e.target.result)
+              console.log("stat", stat)
+              this.chartData =
+                {
+                  labels: new Array(stat[0].data.length).fill(1).map((n, i) => n + i),
+                  datasets: [{
+                    label: 'chartData',
+                    borderColor: '#0000ff',
+                    data: stat[0].data.map(d => d.value),
+                    fill: false
+                  }]
+                }
             }
             reader.readAsText(d)
           })
