@@ -21,3 +21,6 @@ src/backend/sample
 .DS_Store
 .env
 __pycache__
+
+src/backend/temp/*
+!src/backend/temp/.gitkeep
