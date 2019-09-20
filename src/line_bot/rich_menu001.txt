@@ -1,0 +1,89 @@
+curl -v -X POST https://api.line.me/v2/bot/richmenu \
+  -H 'Authorization: Bearer {channel access token}' \
+  -H 'Content-Type:application/json' \
+  -d \
+  '{
+    "size":{
+        "width":1200,
+        "height":810
+    },
+    "selected":false,
+    "name":"Controller",
+    "chatBarText":"Controller",
+    "areas":[
+      {
+        "bounds":{
+          "x":0,
+          "y":0,
+          "width":600,
+          "height":440
+          },
+        "action":{
+          "type":"message",
+          "text":"cell1"
+          }
+      },
+      {
+        "bounds":{
+          "x":600,
+          "y":0,
+          "width":600,
+          "height":440
+          },
+        "action":{
+          "type":"message",
+          "text":"cell2"
+          }
+      },
+      {
+        "bounds":{
+          "x":0,
+          "y":440,
+          "width":395,
+          "height":370
+          },
+        "action":{
+          "type":"message",
+          "text":"cell3"
+          }
+      },
+      {
+        "bounds":{
+          "x":395,
+          "y":440,
+          "width":410,
+          "height":370
+          },
+        "action":{
+          "type":"message",
+          "text":"cell4"
+          }
+      },
+      {
+        "bounds":{
+          "x":805,
+          "y":440,
+          "width":395,
+          "height":370
+          },
+        "action":{
+          "type":"message",
+          "text":"cell5"
+          }
+      }
+    ]
+  }'
+
+"richMenuId":"{richMenuId}"
+
+curl -v -X POST https://api.line.me/v2/bot/richmenu/{richMenuId} \
+-H "Authorization: Bearer {channel access token}" \
+-H "Content-Type: image/png" \
+-T /Users/tomowarkar/Downloads/rm_test001.png
+
+
+https://www.iloveimg.com/ja/download/8bqv13s4chs0v5zgbf29z2gAz1rczlAw9h3yfzn0hrrlmrjgv4fhk8324jm79vy9gf9xmw837vt183q3x99hh73ckhn40gwjs8htlz655x2Am4txlc3dpx6hpg3h2Avg2qh53twvdbA78w44g4g2z8Arcn81lrAghr0q5xrc2ll0z49nvh21/3
+
+
+curl -v -X POST https://api.line.me/v2/bot/user/all/richmenu/{richMenuId} \
+-H "Authorization: Bearer {channel access token}"
