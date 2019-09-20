@@ -1,4 +1,4 @@
-var channel_token = "FgRzCbM/VsbxtRoGtRAUpykdJIMnV1UWeRkPqrdY3t5LQjOGI+4tXdIPao5HZufyrq24ZmlnzzS66Evhev9AZOCe2qIKZIxH+k4WJWnqo+Xm18ZR8LENzpBsKwGYJDZhkK+CE/ZTbJoQxI4jwRH6RQdB04t89/1O/w1cDnyilFU="
+var channel_token = "見せられないよ"
 var url = "https://api.line.me/v2/bot/message/reply"
 
 function doPost(e) {
