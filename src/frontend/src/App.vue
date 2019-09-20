@@ -32,7 +32,7 @@
           <v-row>
             <v-col class="text-center">
               <v-card max-width="344" class="mx-auto">
-                <v-card-title>渋谷店</v-card-title>
+                <v-card-title>渋谷</v-card-title>
                 <v-card-text></v-card-text>
                 <v-card-actions>
                   <v-btn text>Click</v-btn>
@@ -51,7 +51,8 @@
               <v-select
                 :items="items"
                 :value="currentItem"
-                label="Outlined style"
+                label="店舗"
+                outlined
                 @change="showChart"
                 ></v-select>
               <line-chart
@@ -135,9 +136,9 @@ export default {
                 {
                   labels: new Array(stat[0].data.length).fill(1).map((n, i) => n + i),
                   datasets: [{
-                    label: 'chartData',
                     borderColor: '#0000ff',
                     data: stat[0].data.map(d => d.value),
+                    pointRadius: 0,
                     fill: false
                   }]
                 }

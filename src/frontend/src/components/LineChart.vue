@@ -15,12 +15,23 @@ export default {
   data: () =>  ({
     options: {
       title: {
-        display: true,
-        text: 'Line chart'
+        display: false
       },
       legend: {
         display: false
       },
+      responsive: true,
+      scales: {
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+              min: 0,
+              max: 60
+            }
+          }
+        ]
+      }
     }
   }),
   mounted: function() {
