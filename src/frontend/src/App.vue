@@ -2,20 +2,20 @@
   <v-app id="inspire">
     <v-navigation-drawer v-model="drawer" app>
       <v-list dense>
-        <v-list-item @click>
+        <v-list-item @click="viewflag=1" @click.stop="drawer = !drawer">
           <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
+            <v-icon>mdi-map</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
+            <v-list-item-title>noise map</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click>
+        <v-list-item @click="viewflag=2" @click.stop="drawer = !drawer">
           <v-list-item-action>
-            <v-icon>mdi-contact-mail</v-icon>
+            <v-icon>mdi-chart-line-variant</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Contact</v-list-item-title>
+            <v-list-item-title>stat</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -63,19 +63,15 @@
           </v-row>
         </v-container>
       </div>
+
+      <v-footer
+        absolute
+        padless>
+        <div class="flex-grow-1"></div>
+        <span>&copy; 2019</span>
+        <div class="flex-grow-1"></div>
+      </v-footer>
     </v-content>
-
-    <v-bottom-navigation :value="activeBtn" grow color="indigo">
-      <v-btn @click="viewflag=1">
-        <span>noise map</span>
-        <v-icon>mdi-map</v-icon>
-      </v-btn>
-
-      <v-btn @click="viewflag=2">
-        <span>stat</span>
-        <v-icon>mdi-chart-line-variant</v-icon>
-      </v-btn>
-    </v-bottom-navigation>
   </v-app>
 </template>
 
@@ -97,7 +93,7 @@ export default {
     source: String
   },
   data: () => ({
-    drawer: null,
+    drawer: false,
     activeBtn: 1,
     viewflag: 1,
     items: ['渋谷', '品川', '池袋'],
