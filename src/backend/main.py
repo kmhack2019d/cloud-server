@@ -6,8 +6,11 @@ app = Flask(__name__, static_folder='static', static_url_path='/', template_fold
 
 @app.route('/api/v1/get_data')
 def getData():
-    data = get_data.getData(0)
-    return jsonify(data)
+    raspi = 0
+    json_data = 0
+    with open("./temp/data"+str(raspi)+".json", 'r') as fp:
+        json_data = json.load(fp)
+    return jsonify(json_data)
 
 @app.route('/api/v1/get_image')
 def getImage():
