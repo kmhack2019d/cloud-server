@@ -42,6 +42,10 @@ def getImage():
 def index():
     return render_template("index.html")
 
+@app.route('/<id>')
+def detail(id):
+    return render_template("index.html")
+
 if __name__ == '__main__':
     print (app.url_map)
     app.debug = True
