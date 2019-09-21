@@ -19,7 +19,11 @@ def getImage():
     json_data = 0
     with open("./temp/data"+str(raspi)+".json", 'r') as fp:
         json_data = json.load(fp)
-    newest_data = json_data[0]["data"][0]
+
+    max_value = -1
+    for d in json_data[0]["data"][0:5]:
+        if max_value < d["value"]:
+            max_value = d["value"]
 
     if (raspi == 0):
         overlay.overlay(0, "maps/0.jpg", [
@@ -28,7 +32,7 @@ def getImage():
                 "left": 810,
                 "radiusH": 50,
                 "radiusV": 50,
-                "level": newest_data["value"] / 100
+                "level": max_value / 100
             }
         ])
 
