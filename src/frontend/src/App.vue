@@ -4,10 +4,10 @@
       <v-list dense>
         <v-list-item @click="viewflag=1" @click.stop="drawer = !drawer">
           <v-list-item-action>
-            <v-icon>mdi-map</v-icon>
+            <v-icon>mdi-domain</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>noise map</v-list-item-title>
+            <v-list-item-title>店舗</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item @click="viewflag=2" @click.stop="drawer = !drawer">
@@ -15,7 +15,7 @@
             <v-icon>mdi-chart-line-variant</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>stat</v-list-item-title>
+            <v-list-item-title>リアルタイム統計</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -29,16 +29,31 @@
     <v-content>
       <div v-if="viewflag==1">
         <v-container fluid>
-          <v-row>
-            <v-col class="text-center">
-              <v-card max-width="344" class="mx-auto">
-                <v-card-title>渋谷</v-card-title>
-                <v-card-text></v-card-text>
+          <v-row
+                 v-for="(store, i) in stores"
+                 :key="i">
+              <v-card min-width="344" class="mx-auto">
+                <v-card-title v-text="store.title"></v-card-title>
+                <v-card-text v-text="store.text"></v-card-text>
+                <v-card-text v-text="store.level"></v-card-text>
                 <v-card-actions>
-                  <v-btn text>Click</v-btn>
+                  <v-btn text>詳細</v-btn>
                 </v-card-actions>
               </v-card>
-            </v-col>
+              <!-- <v-card max-width="344" class="mx-auto"> -->
+              <!--   <v-card-title>goWork 新宿</v-card-title> -->
+              <!--   <v-card-text></v-card-text> -->
+              <!--   <v-card-actions> -->
+              <!--     <v-btn text>Click</v-btn> -->
+              <!--   </v-card-actions> -->
+              <!-- </v-card> -->
+              <!-- <v-card max-width="344" class="mx-auto"> -->
+              <!--   <v-card-title>coworking 新宿</v-card-title> -->
+              <!--   <v-card-text>unknown</v-card-text> -->
+              <!--   <v-card-actions> -->
+              <!--     <v-btn text>Click</v-btn> -->
+              <!--   </v-card-actions> -->
+              <!-- </v-card> -->
           </v-row>
         </v-container>
       </div>
@@ -83,6 +98,7 @@ import {
   CPS_APP_ID,
   CPS_GROUP_ID
 } from "./config.js"
+import axios from 'axios'
 import LineChart from './components/LineChart'
 
 export default {
@@ -99,8 +115,50 @@ export default {
     items: ['渋谷', '品川', '池袋'],
     currentItem: null,
     chartData: null,
+    stores: [
+      {
+        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
+        title: 'goWork 渋谷',
+        text: '静かレベル',
+        json: null,
+        filename: 'dummysun.json'
+      },
+      {
+        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
+        title: 'goWork 新宿',
+        text: '静かレベル',
+        json: null,
+        filename: 'dummymoon.json'
+      },
+      {
+        src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
+        title: 'coworking 池袋',
+        text: '静かさレベル',
+        json: null,
+        filename: 'dummyvenus.json'
+      },
+    ],
   }),
   methods: {
+    getJsons: function(stores) {
+      cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
+        .then(cred => {
+          console.log("cred", cred.key)
+          const admin = new cpsp.AdminStaff(cred.key)
+          for (let s of stores) {
+            const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', s.filename, true)
+            file.download().then(d => {
+              let reader = new FileReader()
+              reader.onload = e => {
+                const json = JSON.parse(e.target.result)
+                console.log("stat", json)
+                s.json = json
+              }
+              reader.readAsText(d)
+            })
+          }
+        })
+    },
     showChart: function(item) {
       this.currentItem = item
       cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
@@ -143,6 +201,14 @@ export default {
           })
         })
     }
+  },
+  created: function () {
+    this.getJsons(this.stores)
+    // axios.get('http://163.43.194.84/api/v1/get_image')
+    //   .then(response => {
+    //     console.log(response.data) // mockData
+    //     console.log(response.status) // 200
+    //   })
   }
 };
 </script>
