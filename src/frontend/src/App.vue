@@ -29,16 +29,35 @@
     <v-content>
       <div v-if="viewflag==1">
         <v-container fluid>
-          <v-row
-                 v-for="(store, i) in stores"
-                 :key="i">
-              <v-card min-width="344" class="mx-auto">
-                <v-card-title v-text="store.title"></v-card-title>
-                <v-card-text v-text="store.text"></v-card-text>
-                <v-card-text v-text="store.level"></v-card-text>
-                <v-img :src="store.src"></v-img>
+          <v-layout column>
+              <v-card class="mb-2" v-for="(store, i) in stores" :key="i">
+                <v-img
+                  class="white--text"
+                  height="200px"
+                  :src="store.image_url"
+                  >
+                  <v-card-title class="align-end fill-height" v-text="store.title"></v-card-title>
+                </v-img>
+                <v-card-text>
+                  <v-chip class="">リアルタイム静かレベル:
+                    <v-avatar right color="blue" dark v-if="store.level != -1">{{ store.level }}</v-avatar>
+                    <v-avatar right color="black" class="white--text" dark v-else>?</v-avatar>
+                  </v-chip><br/>
+                  <div class="black--text">
+                    {{ store.text }}
+                  </div>
+                  <div class="black--text">
+                    <v-chip v-if="store.active" color="primary" dark>
+                      現在営業中!!
+                    </v-chip>
+                    <div v-else>
+                      現在営業外
+                    </div>
+                  </div>
+                </v-card-text>
+                <v-rating v-model="store.star" readonly></v-rating>
                 <v-card-actions>
-                  <v-btn text>詳細</v-btn>
+                  <v-btn text @click="detail(i)">詳細</v-btn>
                 </v-card-actions>
               </v-card>
               <!-- <v-card max-width="344" class="mx-auto"> -->
@@ -55,11 +74,11 @@
               <!--     <v-btn text>Click</v-btn> -->
               <!--   </v-card-actions> -->
               <!-- </v-card> -->
-          </v-row>
+          </v-layout>
         </v-container>
       </div>
 
-      
+
       <div v-if="viewflag==2">
         <v-container fluid>
           <v-row>
@@ -81,13 +100,48 @@
       </div>
 
       <v-footer
-        absolute
         padless>
         <div class="flex-grow-1"></div>
         <span>&copy; 2019</span>
         <div class="flex-grow-1"></div>
       </v-footer>
     </v-content>
+    <v-dialog v-model="dialog.show" fullscreen hide-overlay>
+        <v-card class="mb-2">
+          <v-img
+            class="white--text"
+            height="200px"
+            :src="dialog.store.image_url"
+            >
+            <div>
+              <v-btn icon outlined color="white" class="mt-2 ml-2" @click="dialog.show = false">×</v-btn>
+            </div>
+          </v-img>
+          <v-card-title>{{dialog.store.title}}</v-card-title>
+          <v-card-text>
+            <v-chip>リアルタイム静かレベル:
+                <v-avatar right color="blue" dark v-if="dialog.store.level != -1">{{ dialog.store.level }}</v-avatar>
+                <v-avatar right color="black" class="white--text" dark v-else>?</v-avatar>
+            </v-chip><br/>
+            <div class="black--text">
+              {{ dialog.store.text }}
+            </div>
+            <div class="black--text">
+              <v-chip v-if="dialog.store.active" color="primary" dark>
+                現在営業中!!
+              </v-chip>
+              <div v-else>
+                現在営業外
+              </div>
+            </div>
+            <div class="mt-6" v-if="dialog.store.level != -1">
+              リアルタイムな机ごとのうるささ
+              <img :src="dialog.store.src" style="width: 100%" ref="store-heatmap">
+            </div>
+          </v-card-text>
+          <v-rating v-model="dialog.store.star" readonly></v-rating>
+        </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -116,64 +170,83 @@ export default {
     items: null,
     currentItem: null,
     chartData: null,
+    dialog: {
+      id: 0,
+      show: false,
+      store: {}
+    },
     stores: [
       {
-        src: 'http://163.43.194.84/api/v1/get_image?rasp_id=0',
+        src: 'http://163.43.194.84/api/v1/get_image',
         title: 'goWork 渋谷',
-        text: '静かレベル',
+        text: '過ごしやすく、とても広い部屋が特徴です。部屋が綺麗で冷暖房完備なので、女性の方もおすすめ！',
         json: null,
         level: undefined,
-        filename: 'data0.json'
+        star: 4,
+        filename: 'data0.json',
+        active: true,
+        image_url: 'https://www.smbc-card.com/hojin/magazine/bizi-dora/general-affairs/img/coworking-space.jpg'
       },
       {
         src: 'http://163.43.194.84/api/v1/get_image',
         title: 'goWork 新宿',
-        text: '静かレベル',
+        text: '新宿で駅近でアクセス良好！本棚が充実しており、プログラミングやデザインを仕事にしている方にぴったり。',
         json: null,
         level: undefined,
-        filename: 'dummymoon.json'
+        star: 3,
+        filename: 'dummymoon.json',
+        active: false,
+        image_url: 'http://workmill.jp/assets/uploads/2016/04/ph01_report3-.jpg'
       },
       {
         src: 'http://163.43.194.84/api/v1/get_image',
         title: 'coworking 池袋',
-        text: '静かさレベル',
+        text: '静かで大変作業がしやすいことが特徴。雑音がなくて、集中したい人にとっておすすめのコアワーキングスペースです。',
         json: null,
-        level: undefined,
-        filename: 'dummyvenus.json'
+        level: -1,
+        star: 5,
+        filename: 'dummyvenus.json',
+        active: true,
+        image_url: 'https://time-space.kddi.com/digicul-column/digicul-joho/20170127/images/img008.jpg'
       },
     ],
   }),
   methods: {
+    detail: function (id) {
+      location.href="/"+id
+    },
     getJsons: async function(stores) {
       cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
         .then(cred => {
           console.log("cred", cred.key)
           const admin = new cpsp.AdminStaff(cred.key)
           for (let s of stores) {
-            const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', s.filename, true)
-            file.download().then(d => {
-              let reader = new FileReader()
-              reader.onload = e => {
-                const json = JSON.parse(e.target.result)
-                console.log("stat", json)
-                s.json = json
-                // only use index 0 mic
-                const aveValue = this.average(json[0].data.map(d => d.value))
-                switch (true) {
-                case aveValue < 100:
-                  s.level = 0
-                case aveValue < 80:
-                  s.level = 1
-                case aveValue < 60:
-                  s.level = 2
-                case aveValue < 40:
-                  s.level = 3
-                case aveValue < 20:
-                  s.level = 4
+            if (s.level != -1) {
+              const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', s.filename, true)
+              file.download().then(d => {
+                let reader = new FileReader()
+                reader.onload = e => {
+                  const json = JSON.parse(e.target.result)
+                  console.log("stat", json)
+                  s.json = json
+                  // only use index 0 mic
+                  const aveValue = this.average(json[0].data.map(d => d.value))
+                  switch (true) {
+                  case aveValue < 100:
+                    s.level = 0
+                  case aveValue < 80:
+                    s.level = 1
+                  case aveValue < 60:
+                    s.level = 2
+                  case aveValue < 40:
+                    s.level = 3
+                  case aveValue < 20:
+                    s.level = 4
+                  }
                 }
-              }
-              reader.readAsText(d)
-            })
+                reader.readAsText(d)
+              })
+            }
           }
         })
     },
@@ -209,6 +282,22 @@ export default {
     //     console.log(response.data) // mockData
     //     console.log(response.status) // 200
     //   })
+    if (location.pathname == "/0") {
+      this.dialog.show = true
+      this.dialog.id = 0
+      this.dialog.store = this.stores[this.dialog.id]
+
+    } else if (location.pathname == "/1") {
+      this.dialog.show = true
+      this.dialog.id = 1
+      this.dialog.store = this.stores[this.dialog.id]
+
+    } else if (location.pathname == "/2") {
+      this.dialog.show = true
+      this.dialog.id = 2
+      this.dialog.store = this.stores[this.dialog.id]
+
+    }
   }
 };
 </script>
