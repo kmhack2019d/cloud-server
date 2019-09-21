@@ -8,19 +8,20 @@ import time
 load_dotenv()
 
 raspi = 0
-items = [0 for i in range(60)]
+items = [[0 for i in range(60)]]
 
 while True:
-    items.append(random.randint(0, 100))
-    items.pop(0)
+    items[raspi].append(random.randint(0, 100))
+    items[raspi].pop(0)
 
     fp = open("temp/data"+str(raspi)+".json",'w')
+    reversed_items = list(reversed(list(map(lambda x: {
+      "time": 0,
+      "value": x
+    }, items[raspi]))))
     json.dump([{
       "micid": 0,
-      "data": list(map(lambda x: {
-        "time": 0,
-        "value": x
-      }, items))
+      "data": reversed_items
     }], fp)
 
     fileName = "data"+str(raspi)+".json"
@@ -35,5 +36,5 @@ while True:
         d = files.update_file(cred, filePath)
     except:
         print("error")
-    time.sleep(3)
+    time.sleep(1)
     print("Done")

@@ -23,11 +23,11 @@ def getImage():
 
     overlay.overlay(0, "maps/0.jpg", [
         {
-            "top": 100,
-            "left": 100,
+            "top": 370,
+            "left": 810,
             "radiusH": 50,
             "radiusV": 50,
-            "level": newest_data["value"]/100
+            "level": (newest_data["value"]-250)/100
         }
     ])
 
