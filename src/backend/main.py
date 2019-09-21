@@ -21,17 +21,18 @@ def getImage():
         json_data = json.load(fp)
     newest_data = json_data[0]["data"][0]
 
-    overlay.overlay(0, "maps/0.jpg", [
-        {
-            "top": 370,
-            "left": 810,
-            "radiusH": 50,
-            "radiusV": 50,
-            "level": (newest_data["value"]-250)/100
-        }
-    ])
+    if (raspi == 0):
+        overlay.overlay(0, "maps/0.jpg", [
+            {
+                "top": 370,
+                "left": 810,
+                "radiusH": 50,
+                "radiusV": 50,
+                "level": newest_data["value"] / 100
+            }
+        ])
 
-    return app.send_static_file('tempfiles/output_0.jpg')
+    return app.send_static_file('tempfiles/output_'+str(raspi)+'.jpg')
 
 @app.route('/')
 def index():
