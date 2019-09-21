@@ -36,6 +36,7 @@
                 <v-card-title v-text="store.title"></v-card-title>
                 <v-card-text v-text="store.text"></v-card-text>
                 <v-card-text v-text="store.level"></v-card-text>
+                <v-img :src="store.src"></v-img>
                 <v-card-actions>
                   <v-btn text>詳細</v-btn>
                 </v-card-actions>
@@ -112,35 +113,38 @@ export default {
     drawer: false,
     activeBtn: 1,
     viewflag: 1,
-    items: ['渋谷', '品川', '池袋'],
+    items: null,
     currentItem: null,
     chartData: null,
     stores: [
       {
-        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
+        src: 'http://163.43.194.84/api/v1/get_image?rasp_id=0',
         title: 'goWork 渋谷',
         text: '静かレベル',
         json: null,
-        filename: 'dummysun.json'
+        level: undefined,
+        filename: 'data0.json'
       },
       {
-        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
+        src: 'http://163.43.194.84/api/v1/get_image',
         title: 'goWork 新宿',
         text: '静かレベル',
         json: null,
+        level: undefined,
         filename: 'dummymoon.json'
       },
       {
-        src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
+        src: 'http://163.43.194.84/api/v1/get_image',
         title: 'coworking 池袋',
         text: '静かさレベル',
         json: null,
+        level: undefined,
         filename: 'dummyvenus.json'
       },
     ],
   }),
   methods: {
-    getJsons: function(stores) {
+    getJsons: async function(stores) {
       cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
         .then(cred => {
           console.log("cred", cred.key)
@@ -153,6 +157,20 @@ export default {
                 const json = JSON.parse(e.target.result)
                 console.log("stat", json)
                 s.json = json
+                // only use index 0 mic
+                const aveValue = this.average(json[0].data.map(d => d.value))
+                switch (true) {
+                case aveValue < 100:
+                  s.level = 0
+                case aveValue < 80:
+                  s.level = 1
+                case aveValue < 60:
+                  s.level = 2
+                case aveValue < 40:
+                  s.level = 3
+                case aveValue < 20:
+                  s.level = 4
+                }
               }
               reader.readAsText(d)
             })
@@ -161,48 +179,30 @@ export default {
     },
     showChart: function(item) {
       this.currentItem = item
-      cpsp.AdminStaff.login(CPS_PROD_MAIL_ADDRESS, CPS_PROD_PASSWORD, undefined, undefined, true)
-        .then(cred => {
-          console.log(item)
-          console.log("cred", cred.key)
-          const admin = new cpsp.AdminStaff(cred.key)
-          let filename;
-          switch (item) {
-          case "渋谷":
-            filename = "dummysun.json"
-            break
-          case "品川":
-            filename = "dummymoon.json"
-            break
-          case "池袋":
-            filename = "dummyvenus.json"
-            break
-          default:
-            filename = "dummy.json"
-          }
-          const file = new cpsp.File(admin, CPS_APP_ID, CPS_GROUP_ID, 'sample_file', filename, true)
-          file.download().then(d => {
-            let reader = new FileReader()
-            reader.onload = e => {
-              const stat = JSON.parse(e.target.result)
-              console.log("stat", stat)
-              this.chartData =
-                {
-                  labels: new Array(stat[0].data.length).fill(1).map((n, i) => n + i),
-                  datasets: [{
-                    borderColor: '#0000ff',
-                    data: stat[0].data.map(d => d.value),
-                    pointRadius: 0,
-                    fill: false
-                  }]
-                }
-            }
-            reader.readAsText(d)
-          })
-        })
-    }
+      const storeIndex = this.items.findIndex(i => i === item)
+      console.log(storeIndex)
+      this.chartData =
+        {
+          labels: new Array(this.stores[storeIndex].json[0].data.length).fill(1).map((n, i) => n + i),
+          datasets: [{
+            borderColor: '#0000ff',
+            data: this.stores[storeIndex].json[0].data.map(d => d.value),
+            pointRadius: 0,
+            fill: false
+          }]
+        }
+    },
+    sum: function(arr) {
+      return arr.reduce(function(prev, current, i, arr) {
+        return prev+current;
+      })
+    },
+    average: function(arr, fn) {
+      return this.sum(arr, fn)/arr.length;
+    },
   },
   created: function () {
+    this.items = this.stores.map(s => s.title)
     this.getJsons(this.stores)
     // axios.get('http://163.43.194.84/api/v1/get_image')
     //   .then(response => {
