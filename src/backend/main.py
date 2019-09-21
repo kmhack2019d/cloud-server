@@ -15,8 +15,11 @@ def getData():
 
 @app.route('/api/v1/get_image')
 def getImage():
-    data = get_data.getData()
-    newest_data = data[0]["data"][0]
+    raspi = 0
+    json_data = 0
+    with open("./temp/data"+str(raspi)+".json", 'r') as fp:
+        json_data = json.load(fp)
+    newest_data = json_data[0]["data"][0]
 
     overlay.overlay(0, "maps/0.jpg", [
         {
