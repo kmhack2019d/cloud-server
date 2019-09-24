@@ -21,4 +21,8 @@ yarn-error.log*
 *.sw?
 
 # CPS-PF JavaScript minimal client library
-cpsp.js
+/src/cpsp.js
+
+# CPS-PF ids
+/src/config.js
+
